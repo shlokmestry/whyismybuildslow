@@ -1,0 +1,11 @@
+# binaries
+/whyismybuildslow
+/bin
+/dist
+
+# macOS
+.DS_Store
+
+# editor
+.vscode
+.idea
