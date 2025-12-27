@@ -9,8 +9,11 @@ import (
 	"os/exec"
 	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/shlokmestry/whyismybuildslow/internal/classifier"
 	"github.com/shlokmestry/whyismybuildslow/internal/events"
+	"github.com/shlokmestry/whyismybuildslow/internal/ui"
 )
 
 func Run(args []string) (int, error) {
@@ -33,6 +36,10 @@ func Run(args []string) (int, error) {
 		commandArgs = args[2:]
 	}
 
+	p := tea.NewProgram(ui.InitialModel())
+	go func() {
+		_ = p.Start()
+	}()
 
 	recorder := events.NewRecorder()
 	recorder.Record("start", "build started")
@@ -41,6 +48,7 @@ func Run(args []string) (int, error) {
 
 	fmt.Printf("🐌 WhyIsMyBuildSlow starting at %s\n", start.Format(time.RFC3339))
 	fmt.Printf("🐌 Running: %s %s\n", command, join(commandArgs))
+
 
 	cmd := exec.Command(command, commandArgs...)
 	cmd.Stdin = os.Stdin
@@ -59,7 +67,6 @@ func Run(args []string) (int, error) {
 		return 1, err
 	}
 
-
 	go scanOutput(stdoutPipe, recorder)
 	go scanOutput(stderrPipe, recorder)
 
@@ -75,7 +82,10 @@ func Run(args []string) (int, error) {
 	fmt.Printf("🐌 Elapsed time: %s\n", elapsed)
 
 
-	detectIdleGaps(recorder.Events, 2*time.Second)
+	detectIdleGaps(recorder.Events, 2*time.Second, p)
+
+
+	p.Send(ui.FinishMsg{})
 
 
 	if err == nil {
@@ -103,8 +113,11 @@ func scanOutput(reader io.Reader, recorder *events.Recorder) {
 	}
 }
 
-
-func detectIdleGaps(eventsList []events.Event, threshold time.Duration) {
+func detectIdleGaps(
+	eventsList []events.Event,
+	threshold time.Duration,
+	p *tea.Program,
+) {
 	for i := 1; i < len(eventsList); i++ {
 		prev := eventsList[i-1]
 		curr := eventsList[i]
@@ -123,10 +136,12 @@ func detectIdleGaps(eventsList []events.Event, threshold time.Duration) {
 				gap.Seconds(),
 				result.Explanation,
 			)
+
+			// Notify UI about stall
+			p.Send(ui.StallMsg{Duration: gap})
 		}
 	}
 }
-
 
 func join(args []string) string {
 	if len(args) == 0 {
