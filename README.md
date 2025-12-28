@@ -9,6 +9,16 @@ bottleneck classification, and a live animated TUI.
 - Animated terminal UI
 - Headless mode for CI (`--no-ui`)
 
+## When should I use this?
+
+Use `whyismybuildslow` when:
+- Your build feels slow but logs don’t explain why
+- CI builds are slower than local runs
+- Dependency installs take unpredictable time
+- You want to understand *idle* or *waiting* time, not just total duration
+
+You run your build exactly the same way — just prefix it with `whyismybuildslow`.
+
 ## Usage
 
 ```bash
