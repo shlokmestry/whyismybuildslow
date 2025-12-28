@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/shlokmestry/whyismybuildslow/internal/runner"
 )
@@ -19,7 +21,7 @@ func main() {
 		case "--no-ui":
 			noUI = true
 		case "--json":
-			jsonOut = true // reserved for Week 7
+			jsonOut = true
 		case "--help", "-h":
 			printHelp()
 			os.Exit(0)
@@ -28,7 +30,7 @@ func main() {
 		}
 	}
 
-	// Guard: require at least something
+	// Require at least something
 	if len(filtered) == 0 {
 		printHelp()
 		os.Exit(2)
@@ -45,14 +47,29 @@ func main() {
 		os.Exit(2)
 	}
 
-	_ = jsonOut // intentionally unused for now
+	// JSON mode implies no UI
+	if jsonOut {
+		noUI = true
+	}
 
-	code, err := runner.Run(filtered, noUI)
-	if err != nil {
+	exitCode, err := runner.Run(filtered, noUI)
+	if err != nil && !jsonOut {
 		fmt.Fprintln(os.Stderr, "error:", err)
 	}
 
-	os.Exit(code)
+	// Emit JSON if requested
+	if jsonOut {
+		summary := map[string]interface{}{
+			"command":   strings.Join(filtered[1:], " "),
+			"exit_code": exitCode,
+		}
+
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		_ = enc.Encode(summary)
+	}
+
+	os.Exit(exitCode)
 }
 
 func printHelp() {
@@ -62,11 +79,12 @@ Usage:
 
 Flags:
   --no-ui     Disable animated UI (CI / logs only)
-  --json      Output machine-readable JSON (coming soon)
+  --json      Output machine-readable JSON
   -h, --help  Show this help
 
 Examples:
   whyismybuildslow run -- npm install
   whyismybuildslow run --no-ui -- sleep 4
+  whyismybuildslow run --json -- sleep 2
 `)
 }
