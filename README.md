@@ -1,6 +1,6 @@
 # WhyIsMyBuildSlow 🐌
 
-A CLI tool that explains *why* your builds are slow — with timing analysis,
+A CLI tool that explains *why* your builds are slow with timing analysis,
 bottleneck classification, and a live animated TUI.
 
 ## Features
