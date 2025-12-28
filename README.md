@@ -1,33 +1,28 @@
 # WhyIsMyBuildSlow 🐌
 
-<<<<<<< HEAD
-A CLI tool that explains *why* your builds are slow with timing analysis,
-bottleneck classification, and a live animated TUI.
-=======
-A CLI tool that explains *why* your builds are slow — using timing analysis,
+A CLI tool that explains **why** your builds are slow using timing analysis,
 bottleneck classification, and a live animated terminal UI.
 
-You run your build exactly the same way — just prefix it with
+You run your build exactly the same way just prefix it with  
 `whyismybuildslow`.
 
 ---
->>>>>>> 4b4ee98 (docs: update README)
 
-## Features
-
-<<<<<<< HEAD
 ## When should I use this?
 
-Use `whyismybuildslow` when:
+Use **whyismybuildslow** when:
+
 - Your build feels slow but logs don’t explain why
 - CI builds are slower than local runs
 - Dependency installs take unpredictable time
 - You want to understand *idle* or *waiting* time, not just total duration
 
-You run your build exactly the same way — just prefix it with `whyismybuildslow`.
+This tool helps surface *where time is actually lost* during a build.
 
-## Usage
-=======
+---
+
+## Features
+
 - Detects idle gaps during builds
 - Classifies bottlenecks (network, cache, Docker)
 - Animated terminal UI for humans
@@ -36,8 +31,22 @@ You run your build exactly the same way — just prefix it with `whyismybuildslo
 
 ---
 
-## Installation
->>>>>>> 4b4ee98 (docs: update README)
+## How it works
+
+`whyismybuildslow` runs your command as-is, captures timing events from stdout/stderr,
+detects idle gaps between outputs, and classifies likely causes such as network waits
+or cache misses. It does not modify your build or environment.
+
+---
+
+## Usage
+
+Run any command exactly as you normally would just prefix it:
 
 ```bash
-go install github.com/shlokmestry/whyismybuildslow/cmd/whyismybuildslow@v1.0.2
+whyismybuildslow run -- npm install
+whyismybuildslow run --no-ui -- sleep 4
+whyismybuildslow run --json -- sleep 2
+
+
+
