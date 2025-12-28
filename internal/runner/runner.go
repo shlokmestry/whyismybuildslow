@@ -88,6 +88,10 @@ func Run(args []string, noUI bool) (int, error) {
 		p.Send(ui.FinishMsg{})
 	}
 
+	// --- Detect idle gaps ---
+	detectIdleGaps(recorder.Events, 2*time.Second)
+
+	// --- Exit code handling ---
 	if err == nil {
 		return 0, nil
 	}
