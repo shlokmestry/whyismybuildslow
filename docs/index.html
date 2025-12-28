@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhyIsMyBuildSlow 🐌</title>
+  <meta name="description" content="A build performance analyzer that explains why your build is slow using real timing metrics and playful visual storytelling." />
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --panel: #12151b;
+      --text: #e6e8eb;
+      --muted: #9aa3ad;
+      --accent: #4cc9f0;
+      --accent-2: #80ffdb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -200px, #1a2030, var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .hero {
+      max-width: 900px;
+    }
+
+    .snail {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: crawl 6s ease-in-out infinite;
+    }
+
+    @keyframes crawl {
+      0% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      100% { transform: translateX(-10px); }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin: 0.5rem 0;
+      letter-spacing: -0.02em;
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .button {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #000;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid #2a3140;
+    }
+
+    section {
+      padding: 5rem 2rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, #141824, var(--panel));
+      border: 1px solid #1f2533;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-top: 0;
+      letter-spacing: -0.01em;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    code, pre {
+      background: #0d1117;
+      border: 1px solid #1f2533;
+      border-radius: 10px;
+      padding: 1rem;
+      display: block;
+      overflow-x: auto;
+      color: #c9d1d9;
+    }
+
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header>
+    <div class="hero">
+      <div class="snail">🐌</div>
+      <h1>WhyIsMyBuildSlow</h1>
+      <p class="tagline">
+        A build performance analyzer that explains <em>why</em> your build is slow — not just how long it takes.
+      </p>
+      <div class="cta">
+        <a class="button" href="https://github.com/shlokmestry/whyismybuildslow" target="_blank">View on GitHub</a>
+        <a class="button secondary" href="#install">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <div class="panel">
+        <h2>The Problem</h2>
+        <p>
+          Builds often <strong>feel slow</strong>, but logs rarely explain why. A command runs… nothing happens… then suddenly it finishes.
+        </p>
+        <p>
+          Was it the network? Dependency downloads? Docker? CI resource limits? Traditional build logs don’t answer these questions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section>
+    <div class="container">
+      <div class="panel">
+        <h2>What I Built</h2>
+        <p>
+          <strong>WhyIsMyBuildSlow</strong> is a CLI tool that runs your build <em>exactly as-is</em>, captures timing events, detects idle gaps, and classifies likely bottlenecks.
+        </p>
+        <ul>
+          <li>Detects where time is actually lost</li>
+          <li>Highlights idle or waiting periods</li>
+          <li>Classifies bottlenecks (network, cache, Docker, etc.)</li>
+          <li>Explains results with a human-friendly animated TUI</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUE -->
+  <section>
+    <div class="container">
+      <div class="panel">
+        <h2>How This Helps Developers</h2>
+        <p>
+          Faster builds don’t start with guessing — they start with <strong>visibility</strong>.
+        </p>
+        <ul>
+          <li>Understand why CI is slower than local runs</li>
+          <li>Spot flaky dependency installs and network stalls</li>
+          <li>Optimize with evidence, not assumptions</li>
+          <li>Export JSON output for CI and automation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section id="install">
+    <div class="container">
+      <div class="panel">
+        <h2>Install & Usage</h2>
+        <p>Run your build exactly the same way — just prefix it:</p>
+        <pre><code>whyismybuildslow run -- npm install
+whyismybuildslow run --no-ui -- sleep 4
+whyismybuildslow run --json -- sleep 2</code></pre>
+        <p>
+          No environment changes. No build modification. Just insight.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Built with care for developers who hate waiting 🐌<br />
+      © 2025 WhyIsMyBuildSlow
+    </p>
+  </footer>
+
+</body>
+</html>
