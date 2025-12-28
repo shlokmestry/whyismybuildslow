@@ -16,8 +16,10 @@ import (
 	"github.com/shlokmestry/whyismybuildslow/internal/ui"
 )
 
-func Run(args []string) (int, error) {
-
+func Run(args []string, noUI bool) (int, error) {
+	// -----------------------------
+	// Argument validation
+	// -----------------------------
 	if len(args) == 0 {
 		return 2, errors.New("missing '-- <command>'")
 	}
@@ -36,19 +38,29 @@ func Run(args []string) (int, error) {
 		commandArgs = args[2:]
 	}
 
+	// -----------------------------
+	// Start UI (optional)
+	// -----------------------------
+	var p *tea.Program
 
-	p := tea.NewProgram(ui.InitialModel())
-	go func() {
-		_ = p.Start()
-	}()
+	if !noUI {
+		p = tea.NewProgram(ui.InitialModel())
+		go func() {
+			_ = p.Start()
+		}()
+	}
 
-
+	// -----------------------------
+	// Event recorder
+	// -----------------------------
 	recorder := events.NewRecorder()
 	recorder.Record("start", "build started")
 
 	start := time.Now()
 
-
+	// -----------------------------
+	// Prepare command
+	// -----------------------------
 	cmd := exec.Command(command, commandArgs...)
 	cmd.Stdin = os.Stdin
 
@@ -62,7 +74,9 @@ func Run(args []string) (int, error) {
 		return 1, err
 	}
 
-
+	// -----------------------------
+	// Start command
+	// -----------------------------
 	if err := cmd.Start(); err != nil {
 		return 1, err
 	}
@@ -71,7 +85,9 @@ func Run(args []string) (int, error) {
 	go scanOutput(stdoutPipe, recorder)
 	go scanOutput(stderrPipe, recorder)
 
-
+	// -----------------------------
+	// Wait for completion
+	// -----------------------------
 	err = cmd.Wait()
 
 	end := time.Now()
@@ -79,13 +95,21 @@ func Run(args []string) (int, error) {
 
 	recorder.Record("end", "build finished")
 
-	
+	// -----------------------------
+	// Analyze idle gaps
+	// -----------------------------
 	detectIdleGaps(recorder.Events, 2*time.Second, p)
 
+	// -----------------------------
+	// Finish UI cleanly
+	// -----------------------------
+	if p != nil {
+		p.Send(ui.FinishMsg{})
+	}
 
-	p.Send(ui.FinishMsg{})
-
-
+	// -----------------------------
+	// Summary output
+	// -----------------------------
 	fmt.Printf("\n🐌 Finished at %s\n", end.Format(time.RFC3339))
 	fmt.Printf("🐌 Elapsed time: %s\n", elapsed)
 
@@ -104,7 +128,9 @@ func Run(args []string) (int, error) {
 	return 1, err
 }
 
-
+// ------------------------------------------------------
+// Output scanning (no printing; UI owns terminal)
+// ------------------------------------------------------
 func scanOutput(reader io.Reader, recorder *events.Recorder) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
@@ -112,7 +138,9 @@ func scanOutput(reader io.Reader, recorder *events.Recorder) {
 	}
 }
 
-
+// ------------------------------------------------------
+// Idle gap detection + classification + UI signaling
+// ------------------------------------------------------
 func detectIdleGaps(
 	eventsList []events.Event,
 	threshold time.Duration,
@@ -130,25 +158,13 @@ func detectIdleGaps(
 				gap.Seconds(),
 			)
 
-			// Notify UI
-			p.Send(ui.StallMsg{
-				Duration: gap,
-				Cause:    string(result.Cause),
-			})
+			// Notify UI only if enabled
+			if p != nil {
+				p.Send(ui.StallMsg{
+					Duration: gap,
+					Cause:    string(result.Cause),
+				})
+			}
 		}
 	}
-}
-
-func join(args []string) string {
-	if len(args) == 0 {
-		return ""
-	}
-	out := ""
-	for i, a := range args {
-		if i > 0 {
-			out += " "
-		}
-		out += a
-	}
-	return out
 }
