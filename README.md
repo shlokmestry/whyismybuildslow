@@ -1,21 +1,19 @@
 # WhyIsMyBuildSlow 🐌
 
-<<<<<<< Updated upstream
+
 A CLI tool that explains **why** your builds are slow using timing analysis,
 bottleneck classification, and a live animated terminal UI.
 
 You run your build exactly the same way just prefix it with  
-=======
+
 A CLI tool that explains *why* your builds are slow  using timing analysis,
 bottleneck classification, and a live animated terminal UI.
 
 You run your build exactly the same way just prefix it with
->>>>>>> Stashed changes
+
 `whyismybuildslow`.
 
 ---
-
-<<<<<<< Updated upstream
 ## When should I use this?
 
 Use **whyismybuildslow** when:
@@ -29,8 +27,6 @@ This tool helps surface *where time is actually lost* during a build.
 
 ---
 
-=======
->>>>>>> Stashed changes
 ## Features
 
 - Detects idle gaps during builds
@@ -41,7 +37,6 @@ This tool helps surface *where time is actually lost* during a build.
 
 ---
 
-<<<<<<< Updated upstream
 ## How it works
 
 `whyismybuildslow` runs your command as-is, captures timing events from stdout/stderr,
@@ -49,6 +44,15 @@ detects idle gaps between outputs, and classifies likely causes such as network 
 or cache misses. It does not modify your build or environment.
 
 ---
+
+
+
+## Installation
+
+```bash
+go install github.com/shlokmestry/whyismybuildslow/cmd/whyismybuildslow@v1.0.2 
+
+--
 
 ## Usage
 
@@ -58,15 +62,6 @@ Run any command exactly as you normally would just prefix it:
 whyismybuildslow run -- npm install
 whyismybuildslow run --no-ui -- sleep 4
 whyismybuildslow run --json -- sleep 2
-
-
-
-=======
-## Installation
-
-```bash
-go install github.com/shlokmestry/whyismybuildslow/cmd/whyismybuildslow@v1.0.2
-
 
 
 ## Short note:
