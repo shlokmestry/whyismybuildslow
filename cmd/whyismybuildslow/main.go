@@ -8,26 +8,65 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		printUsage()
+	args := os.Args[1:]
+
+	noUI := false
+	jsonOut := false
+	filtered := []string{}
+
+	for _, a := range args {
+		switch a {
+		case "--no-ui":
+			noUI = true
+		case "--json":
+			jsonOut = true // reserved for Week 7
+		case "--help", "-h":
+			printHelp()
+			os.Exit(0)
+		default:
+			filtered = append(filtered, a)
+		}
+	}
+
+	// Guard: require at least something
+	if len(filtered) == 0 {
+		printHelp()
 		os.Exit(2)
 	}
 
-	switch os.Args[1] {
-	case "run":
-		exitCode, err := runner.Run(os.Args[2:])
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error:", err)
-		}
-		os.Exit(exitCode)
-	default:
-		fmt.Fprintf(os.Stderr, "Unknown command: %s\n\n", os.Args[1])
-		printUsage()
+	// Strip "run" subcommand if present
+	if filtered[0] == "run" {
+		filtered = filtered[1:]
+	}
+
+	// After stripping, we still need the actual command
+	if len(filtered) == 0 {
+		printHelp()
 		os.Exit(2)
 	}
+
+	_ = jsonOut // intentionally unused for now
+
+	code, err := runner.Run(filtered, noUI)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+	}
+
+	os.Exit(code)
 }
 
-func printUsage() {
-	fmt.Println("Usage:")
-	fmt.Println("  whyismybuildslow run -- <command> [args...]")
+func printHelp() {
+	fmt.Println(`WhyIsMyBuildSlow 🐌
+Usage:
+  whyismybuildslow run [flags] -- <command>
+
+Flags:
+  --no-ui     Disable animated UI (CI / logs only)
+  --json      Output machine-readable JSON (coming soon)
+  -h, --help  Show this help
+
+Examples:
+  whyismybuildslow run -- npm install
+  whyismybuildslow run --no-ui -- sleep 4
+`)
 }
