@@ -52,10 +52,8 @@ func Run(args []string, noUI bool) (int, error) {
 	recorder := events.NewRecorder()
 	recorder.Record("start", "build started")
 
-	start := time.Now()
-
 	// -----------------------------
-	// Prepare command
+	// Run command
 	// -----------------------------
 	cmd := exec.Command(command, commandArgs...)
 	cmd.Stdin = os.Stdin
@@ -74,14 +72,10 @@ func Run(args []string, noUI bool) (int, error) {
 		return 1, err
 	}
 
-	// Capture output silently (UI owns stdout)
 	go scanOutput(stdoutPipe, recorder)
 	go scanOutput(stderrPipe, recorder)
 
 	err = cmd.Wait()
-
-	end := time.Now()
-	
 
 	recorder.Record("end", "build finished")
 
@@ -135,7 +129,6 @@ func detectIdleGaps(
 
 			lastCause = string(result.Cause)
 
-			// Notify UI only if enabled
 			if p != nil {
 				p.Send(ui.StallMsg{
 					Duration: gap,
