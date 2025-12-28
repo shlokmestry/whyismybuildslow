@@ -1,44 +1,49 @@
 package ui
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// Messages sent to the UI
+// Messages
 type TickMsg time.Time
-type StartMsg struct{}
 type FinishMsg struct{}
 type StallMsg struct {
 	Duration time.Duration
+	Cause    string
 }
 
-// UI model
+// Model
 type Model struct {
 	StartTime time.Time
 	Now       time.Time
+	Finished  bool
+
 	Stalled   bool
 	StallFor  time.Duration
-	Finished  bool
+	Cause     string
 }
 
-// Create initial model
+// Initial model
 func InitialModel() Model {
+	now := time.Now()
 	return Model{
-		StartTime: time.Now(),
-		Now:       time.Now(),
+		StartTime: now,
+		Now:       now,
 	}
 }
 
-// Init is called once
+// Init
 func (m Model) Init() tea.Cmd {
 	return tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
 		return TickMsg(t)
 	})
 }
 
-// Update handles messages
+// Update
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
@@ -51,6 +56,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case StallMsg:
 		m.Stalled = true
 		m.StallFor = msg.Duration
+		m.Cause = msg.Cause
 		return m, nil
 
 	case FinishMsg:
@@ -61,17 +67,59 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View renders the UI
+// View
 func (m Model) View() string {
-	elapsed := m.Now.Sub(m.StartTime).Round(time.Millisecond)
+	elapsed := m.Now.Sub(m.StartTime)
+	bar := progressBar(elapsed)
 
 	if m.Finished {
-		return "✅ Build finished\n"
+		return fmt.Sprintf(
+			"✅ Build finished\nElapsed: %s\n",
+			elapsed.Round(time.Millisecond),
+		)
 	}
 
 	if m.Stalled {
-		return "🐌 Network Slug crawling...\nElapsed: " + elapsed.String() + "\n"
+		return fmt.Sprintf(
+			"%s\nElapsed: %s\n\n%s\n",
+			bar,
+			elapsed.Round(time.Millisecond),
+			characterLine(m.Cause),
+		)
 	}
 
-	return "⚙️ Building...\nElapsed: " + elapsed.String() + "\n"
+	return fmt.Sprintf(
+		"%s\nElapsed: %s\n",
+		bar,
+		elapsed.Round(time.Millisecond),
+	)
+}
+
+
+
+func progressBar(elapsed time.Duration) string {
+	// Fake progress for UX (we don't know total time)
+	percent := int(elapsed.Seconds()*15) % 100
+	width := 20
+	filled := (percent * width) / 100
+
+	return fmt.Sprintf(
+		"⚙️ Building %s%s %d%%",
+		strings.Repeat("█", filled),
+		strings.Repeat("░", width-filled),
+		percent,
+	)
+}
+
+func characterLine(cause string) string {
+	switch cause {
+	case "network":
+		return "🐌 Network Slug crawling…"
+	case "cache":
+		return "🧊 Cache Golem awakening…"
+	case "docker":
+		return "🚚 Docker Truck unloading layers…"
+	default:
+		return "🤷 Something is slowing things down…"
+	}
 }

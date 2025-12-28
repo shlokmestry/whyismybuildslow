@@ -36,18 +36,17 @@ func Run(args []string) (int, error) {
 		commandArgs = args[2:]
 	}
 
+
 	p := tea.NewProgram(ui.InitialModel())
 	go func() {
 		_ = p.Start()
 	}()
 
+
 	recorder := events.NewRecorder()
 	recorder.Record("start", "build started")
 
 	start := time.Now()
-
-	fmt.Printf("🐌 WhyIsMyBuildSlow starting at %s\n", start.Format(time.RFC3339))
-	fmt.Printf("🐌 Running: %s %s\n", command, join(commandArgs))
 
 
 	cmd := exec.Command(command, commandArgs...)
@@ -63,10 +62,12 @@ func Run(args []string) (int, error) {
 		return 1, err
 	}
 
+
 	if err := cmd.Start(); err != nil {
 		return 1, err
 	}
 
+	// Capture output silently (UI owns stdout)
 	go scanOutput(stdoutPipe, recorder)
 	go scanOutput(stderrPipe, recorder)
 
@@ -78,15 +79,15 @@ func Run(args []string) (int, error) {
 
 	recorder.Record("end", "build finished")
 
-	fmt.Printf("\n🐌 Finished at %s\n", end.Format(time.RFC3339))
-	fmt.Printf("🐌 Elapsed time: %s\n", elapsed)
-
-
+	
 	detectIdleGaps(recorder.Events, 2*time.Second, p)
 
 
 	p.Send(ui.FinishMsg{})
 
+
+	fmt.Printf("\n🐌 Finished at %s\n", end.Format(time.RFC3339))
+	fmt.Printf("🐌 Elapsed time: %s\n", elapsed)
 
 	if err == nil {
 		fmt.Println("🐌 Exit code: 0")
@@ -107,11 +108,10 @@ func Run(args []string) (int, error) {
 func scanOutput(reader io.Reader, recorder *events.Recorder) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Println(line)
-		recorder.Record("output", line)
+		recorder.Record("output", scanner.Text())
 	}
 }
+
 
 func detectIdleGaps(
 	eventsList []events.Event,
@@ -130,15 +130,11 @@ func detectIdleGaps(
 				gap.Seconds(),
 			)
 
-			fmt.Printf(
-				"\n%s detected (%.1fs)\n%s\n",
-				result.Character,
-				gap.Seconds(),
-				result.Explanation,
-			)
-
-			// Notify UI about stall
-			p.Send(ui.StallMsg{Duration: gap})
+			// Notify UI
+			p.Send(ui.StallMsg{
+				Duration: gap,
+				Cause:    string(result.Cause),
+			})
 		}
 	}
 }
