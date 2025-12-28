@@ -1,14 +1,21 @@
 # WhyIsMyBuildSlow 🐌
 
+<<<<<<< HEAD
 A CLI tool that explains *why* your builds are slow with timing analysis,
 bottleneck classification, and a live animated TUI.
+=======
+A CLI tool that explains *why* your builds are slow — using timing analysis,
+bottleneck classification, and a live animated terminal UI.
+
+You run your build exactly the same way — just prefix it with
+`whyismybuildslow`.
+
+---
+>>>>>>> 4b4ee98 (docs: update README)
 
 ## Features
-- Detects idle build gaps
-- Classifies causes (network, cache, Docker)
-- Animated terminal UI
-- Headless mode for CI (`--no-ui`)
 
+<<<<<<< HEAD
 ## When should I use this?
 
 Use `whyismybuildslow` when:
@@ -20,7 +27,17 @@ Use `whyismybuildslow` when:
 You run your build exactly the same way — just prefix it with `whyismybuildslow`.
 
 ## Usage
+=======
+- Detects idle gaps during builds
+- Classifies bottlenecks (network, cache, Docker)
+- Animated terminal UI for humans
+- Headless mode for CI (`--no-ui`)
+- Machine-readable output for automation (`--json`)
+
+---
+
+## Installation
+>>>>>>> 4b4ee98 (docs: update README)
 
 ```bash
-whyismybuildslow run -- npm install
-whyismybuildslow run --no-ui -- sleep 4
+go install github.com/shlokmestry/whyismybuildslow/cmd/whyismybuildslow@v1.0.2
