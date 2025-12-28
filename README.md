@@ -3,7 +3,7 @@
 A CLI tool that explains **why** your builds are slow using timing analysis,
 bottleneck classification, and a live animated terminal UI.
 
-You run your build exactly the same way — just prefix it with  
+You run your build exactly the same way just prefix it with  
 `whyismybuildslow`.
 
 ---
@@ -31,6 +31,14 @@ This tool helps surface *where time is actually lost* during a build.
 
 ---
 
+## How it works
+
+`whyismybuildslow` runs your command as-is, captures timing events from stdout/stderr,
+detects idle gaps between outputs, and classifies likely causes such as network waits
+or cache misses. It does not modify your build or environment.
+
+---
+
 ## Usage
 
 Run any command exactly as you normally would — just prefix it:
@@ -39,3 +47,6 @@ Run any command exactly as you normally would — just prefix it:
 whyismybuildslow run -- npm install
 whyismybuildslow run --no-ui -- sleep 4
 whyismybuildslow run --json -- sleep 2
+
+
+
