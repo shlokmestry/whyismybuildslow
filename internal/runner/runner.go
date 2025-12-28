@@ -81,7 +81,7 @@ func Run(args []string, noUI bool) (int, error) {
 	err = cmd.Wait()
 
 	end := time.Now()
-	elapsed := end.Sub(start)
+	
 
 	recorder.Record("end", "build finished")
 
