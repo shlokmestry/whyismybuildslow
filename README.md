@@ -41,7 +41,7 @@ or cache misses. It does not modify your build or environment.
 
 ## Usage
 
-Run any command exactly as you normally would — just prefix it:
+Run any command exactly as you normally would just prefix it:
 
 ```bash
 whyismybuildslow run -- npm install
