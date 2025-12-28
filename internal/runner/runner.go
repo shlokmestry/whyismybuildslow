@@ -80,18 +80,17 @@ func Run(args []string, noUI bool) (int, error) {
 	recorder.Record("end", "build finished")
 
 	// -----------------------------
-	// Detect stalls
+	// Detect idle gaps
 	// -----------------------------
-	_ = detectIdleGaps(recorder.Events, 2*time.Second, p)
+	detectIdleGaps(recorder.Events, 2*time.Second, p)
 
 	if p != nil {
 		p.Send(ui.FinishMsg{})
 	}
 
-	// --- Detect idle gaps ---
-	detectIdleGaps(recorder.Events, 2*time.Second)
-
-	// --- Exit code handling ---
+	// -----------------------------
+	// Exit code handling
+	// -----------------------------
 	if err == nil {
 		return 0, nil
 	}
